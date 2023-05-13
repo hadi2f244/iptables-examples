@@ -48,6 +48,15 @@ ICMP types:
 -A INPUT -m conntrack -p icmp --icmp-type 12 --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
 ```
 
+# Show number of pkts and bytes a (Filter rule) rule passed/dropped:
+```
+sudo iptables -L -v
+```
+To reset counters:
+```
+sudo iptables -Z
+```
+
 # Example 1: Some filter rules compatible with the DOCKER-USER chain
 ```
 -A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
