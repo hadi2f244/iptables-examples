@@ -24,6 +24,29 @@ sudo nmap -sX <serverIP>
 iptables -t mangle -L --line-numbers
 iptables -t mangle -D PREROUTING <linenumber>
 ```
+# Drop policy
+To drop packets as default policy, You have two ways:
+1. Add DROP rule at the end of the table
+```
+sudo iptables -A INPUT -j DROP
+```
+2. Set default DROP policy
+```
+sudo iptables -P INPUT DROP
+```
+
+# Block ICMP
+ICMP types:
+* type-3: Desitination unreachable(Used to say large packets should be fragmented)
+* type-11: Time excceeded messages
+* type-12: Bad IP header
+* type-0 and type-8: Infamous ping packets (echo and it reply)
+* type-5: Redirect messages, which a hacker may use to redirect to someplace
+```
+-A INPUT -m conntrack -p icmp --icmp-type 3 --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -m conntrack -p icmp --icmp-type 11 --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -m conntrack -p icmp --icmp-type 12 --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+```
 
 # Example 1: Some filter rules compatible with the DOCKER-USER chain
 ```
@@ -51,3 +74,4 @@ iptables -t mangle -D PREROUTING <linenumber>
 -A DOCKER-USER -j RETURN
 
 ```
+
