@@ -25,6 +25,7 @@ sudo iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
 * Block invalid packets in Mangle table before Input table to increase performance
 ```
 sudo iptables -t mangle -A PREROUTING -m conntrack --ctstate INVALID -j DROP
+sudo iptables -t mangle -A PREROUTING -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m conntrack --ctstate NEW -j DROP
 # Test : Should block these scans
 # Window scan (Send ack packets)
 sudo nmap -sW <serverIP>
@@ -202,7 +203,21 @@ sudo iptables -Z
 
 # Notes
 * If you don't set `-t` in iptables commands, *filter* tables is used as default.
+* You can use *UFW* instead of pure iptables. It defined some usuall protection rules in advance. For example in `/etc/ufw/before.rules` you can find some predefined icmp filters.
+```
+# ok icmp codes for INPUT
+-A ufw-before-input -p icmp --icmp-type destination-unreachable -j ACCEPT
+-A ufw-before-input -p icmp --icmp-type time-exceeded -j ACCEPT
+-A ufw-before-input -p icmp --icmp-type parameter-problem -j ACCEPT
+-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT
 
+# ok icmp code for FORWARD
+-A ufw-before-forward -p icmp --icmp-type destination-unreachable -j ACCEPT
+-A ufw-before-forward -p icmp --icmp-type time-exceeded -j ACCEPT
+-A ufw-before-forward -p icmp --icmp-type parameter-problem -j ACCEPT
+-A ufw-before-forward -p icmp --icmp-type echo-request -j ACCEPT
+```
+Thus, it seems a good idea to use ufw and add custom iptables rules to **.rules* in `/etc/ufw` directory.
 
 # Referece:
 * My main reference is [Masting Linux Security and Hardening](https://www.packtpub.com/product/mastering-linux-security-and-hardening-second-edition/) book by Donald A.Tevault.
