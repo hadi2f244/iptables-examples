@@ -2,6 +2,20 @@
 Some usual iptables rules
 
 
+## Usuall rules
+
+```
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# ssh port
+sudo iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+# When a machine is DNS server
+sudo iptables -A INPUT tcp --dport 53 -j ACCEPT
+sudo iptables -A INPUT udp --dport 53 -j ACCEPT
+
+#
+sudo iptables -I INPUT 1 -i lo -j ACCEPT
+```
+
 ## Block Invalid packets
 
 * Block invalid packet in filter table
@@ -46,15 +60,6 @@ ICMP types:
 -A INPUT -m conntrack -p icmp --icmp-type 3 --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
 -A INPUT -m conntrack -p icmp --icmp-type 11 --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
 -A INPUT -m conntrack -p icmp --icmp-type 12 --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
-```
-
-## Show number of pkts and bytes a (Filter rule) rule passed/dropped:
-```
-sudo iptables -L -v
-```
-To reset counters:
-```
-sudo iptables -Z
 ```
 
 ## IPV6
@@ -120,7 +125,9 @@ sudo iptables -I INPUT 5 -m limit --limit 5/min -j LOG --log-prefix "iptables de
 Sometimes for TShooting you need to allow all traffic
 ```
 echo "Stopping firewall and allowing everyone..."
+# Delete rules
 iptables -F
+# Delete user-defined chains
 iptables -X
 iptables -t nat -F
 iptables -t nat -X
@@ -131,6 +138,37 @@ iptables -P FORWARD ACCEPT
 iptables -P OUTPUT ACCEPT
 ```
 Run it as a bash script
+
+## User-Defined chains
+```
+# Create Chain and its rules
+sudo iptables -N MYCHAIN
+sudo iptables -A MYCHAIN -s <ip> -j ACCEPT
+sudo iptables -A MYCHAIN -j RETURN
+
+# Add chain to iptables main chains
+sudo iptables -A INPUT -j MYCHAIN
+```
+
+## Useful Commands
+
+* Show All tables rules:
+```
+for t in filter nat mangle raw security; do
+   echo "table $t:"
+   sudo iptables -t $t -L
+done
+```
+* Show number of pkts and bytes a (Filter rule) rule passed/dropped:
+```
+sudo iptables -L -v
+```
+To reset counters:
+```
+sudo iptables -Z
+```
+
+
 
 # Examples
 ## Example 1: Some filter rules compatible with the DOCKER-USER chain
@@ -160,6 +198,11 @@ Run it as a bash script
 
 ```
 
+# Notes
+* If you don't set `-t` in iptables commands, *filter* tables is used as default.
+
+
 # Referece:
 * My main reference is [Masting Linux Security and Hardening](https://www.packtpub.com/product/mastering-linux-security-and-hardening-second-edition/) book by Donald A.Tevault.
 * [Ubuntu basic tutorial](https://help.ubuntu.com/community/IptablesHowTo)
+* [A Deep Dive into Iptablse and Netfilter Architecture](https://www.digitalocean.com/community/tutorials/a-deep-dive-into-iptables-and-netfilter-architecture)
