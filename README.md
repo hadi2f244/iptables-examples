@@ -12,7 +12,7 @@ sudo iptables -A INPUT -p tcp --dport ssh -j ACCEPT
 sudo iptables -A INPUT tcp --dport 53 -j ACCEPT
 sudo iptables -A INPUT udp --dport 53 -j ACCEPT
 
-#
+# Add loopback rules
 sudo iptables -I INPUT 1 -i lo -j ACCEPT
 ```
 
@@ -71,6 +71,7 @@ sudo ip6tables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 sudo ip6tables -A INPUT -p tcp --dport ssh -j ACCEPT
 sudo ip6tables -A INPUT -p tcp --dport 53 -j ACCEPT
 sudo ip6tables -A INPUT -p udp --dport 53 -j ACCEPT
+sudo ip6tables -A INPUT -i lo -j ACCEPT
 ```
 ICMPv6 messages have more usage than ipv4 version because ipv6 use icmp for ARP, DHCP, tunneling and etc.
 ```
@@ -144,6 +145,7 @@ Run it as a bash script
 # Create Chain and its rules
 sudo iptables -N MYCHAIN
 sudo iptables -A MYCHAIN -s <ip> -j ACCEPT
+# Return tracking jump back the callee chain
 sudo iptables -A MYCHAIN -j RETURN
 
 # Add chain to iptables main chains
@@ -206,3 +208,5 @@ sudo iptables -Z
 * My main reference is [Masting Linux Security and Hardening](https://www.packtpub.com/product/mastering-linux-security-and-hardening-second-edition/) book by Donald A.Tevault.
 * [Ubuntu basic tutorial](https://help.ubuntu.com/community/IptablesHowTo)
 * [A Deep Dive into Iptablse and Netfilter Architecture](https://www.digitalocean.com/community/tutorials/a-deep-dive-into-iptables-and-netfilter-architecture)
+* [Iptables targets and jumps](https://www.frozentux.net/iptables-tutorial/chunkyhtml/c3965.html)
+* [NAT iptables tutorial](https://www.karlrupp.net/en/computer/nat_tutorial)
