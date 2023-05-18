@@ -36,7 +36,7 @@ sudo nmap -sX <serverIP>
 ## Delete rule
 * Delete by line number
 ```
-iptables -t mangle -L --line-numbers
+iptables -t mangle -L -nv --line-numbers
 iptables -t mangle -D PREROUTING <linenumber>
 ```
 ## Drop policy
@@ -159,12 +159,12 @@ sudo iptables -A INPUT -j MYCHAIN
 ```
 for t in filter nat mangle raw security; do
    echo "table $t:"
-   sudo iptables -t $t -L
+   sudo iptables -t $t -L -nv
 done
 ```
 * Show number of pkts and bytes a (Filter rule) rule passed/dropped:
 ```
-sudo iptables -L -v
+sudo iptables -L -nv
 ```
 To reset counters:
 ```
