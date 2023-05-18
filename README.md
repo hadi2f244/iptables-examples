@@ -9,8 +9,8 @@ sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 # ssh port
 sudo iptables -A INPUT -p tcp --dport ssh -j ACCEPT
 # When a machine is DNS server
-sudo iptables -A INPUT tcp --dport 53 -j ACCEPT
-sudo iptables -A INPUT udp --dport 53 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 53 -j ACCEPT
+sudo iptables -A INPUT -p udp --dport 53 -j ACCEPT
 
 # Add loopback rules
 sudo iptables -I INPUT 1 -i lo -j ACCEPT
